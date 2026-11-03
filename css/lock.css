@@ -30,8 +30,6 @@ button { cursor: pointer; }
 .balao.erro::after { border-color: var(--rubi); }
 .campo { display: block; width: 100%; height: 50px; padding: 0 16px; border: 2px solid var(--linha); background: var(--papel-2); border-radius: 14px; font-size: 18px; }
 .campo:focus { border-color: var(--tinta); outline: none; }
-.lembrar { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; font-size: 14px; color: var(--tinta-2); }
-.lembrar input { width: 18px; height: 18px; accent-color: var(--rubi); }
 .msg-erro { color: var(--rubi); font-weight: 600; font-size: 14px; min-height: 20px; margin: 8px 0 0; }
 @keyframes tremer { 20% { transform: translateX(-8px) } 40% { transform: translateX(7px) } 60% { transform: translateX(-5px) } 80% { transform: translateX(3px) } }
 
