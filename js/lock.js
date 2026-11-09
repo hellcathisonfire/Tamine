@@ -15,29 +15,29 @@
       </form></div>`;
     $('#f-senha').addEventListener('submit', async ev => {
       ev.preventDefault();
-      const modo = ev.submitter && ev.submitter.value === 'ia';
+      const ia = !!(ev.submitter && ev.submitter.value === 'ia');
       document.querySelectorAll('#f-senha button').forEach(x => { x.disabled = true; });
       try {
         const k = await C.chaves($('#senha').value);
-        if ((await C.sha256hex(k.auth)) !== CFG.authHash) return tela(true);
-        window.CV_ABRIR_IA = modo; await abrir(k);
+        if ((await C.sha256hex(k.auth)) !== (ia ? CFG.authHashIA : CFG.authHash)) return tela(true);
+        await abrir(k, ia);
       } catch (e) { tela(true, 'Não consegui abrir agora. Confira a internet e tente de novo.'); }
     });
     setTimeout(() => { const i = $('#senha'); if (i) i.focus(); }, 30);
   }
 
   // o programa fica cifrado no servidor: só com a senha certa ele é aberto
-  async function abrir(k) {
-    const r = await fetch('app.bin', { cache: 'no-cache' });
+  async function abrir(k, ia) {
+    const r = await fetch(ia ? 'ia.bin' : 'app.bin', { cache: 'no-cache' });
     if (!r.ok) throw new Error('sem pacote');
     const pacote = await C.decifrar(await r.text(), k.enc);
     window.CV_CHAVES = k;
-    window.CV_WORKER_URL = URL.createObjectURL(new Blob([pacote.worker], { type: 'text/javascript' }));
+    if (pacote.worker) window.CV_WORKER_URL = URL.createObjectURL(new Blob([pacote.worker], { type: 'text/javascript' }));
     const st = document.createElement('style'); st.textContent = pacote.css; document.head.appendChild(st);
     for (const js of pacote.js) { const s = document.createElement('script'); s.textContent = js; document.head.appendChild(s); }
     vigiarInatividade();
     $('#trava').hidden = true; $('#trava').innerHTML = '';
-    window.CVApp.iniciar();
+    (ia ? window.CVIAApp : window.CVApp).iniciar();
   }
 
   // sem interação por 5 minutos: bloqueia (recarrega, e a senha some da memória). Não bloqueia no meio de um envio.
