@@ -9,18 +9,19 @@
     t.innerHTML = `<div class="trava-in"><form class="balao${erro ? ' erro' : ''}" id="f-senha" autocomplete="off">
         <h1>Qual é a senha?</h1><p>Digite para entrar.</p>
         <label for="senha" style="position:absolute;left:-9999px">Senha</label>
-        <input id="senha" class="campo" type="password" autocomplete="current-password" placeholder="Digite aqui">
+        <input id="senha" class="campo" type="password" autocomplete="current-password" enterkeyhint="go" placeholder="Digite aqui">
         <p class="msg-erro" id="msg-erro" role="alert">${erro ? (msg || 'Senha incorreta. Tente de novo.') : ''}</p>
-        <div class="trava-botoes"><button class="btn cheio grande" value="app">Entrar</button><button class="btn grande" value="ia">Usar IA</button></div>
+        <div class="dica"><span>Confirmar</span><kbd>Enter</kbd></div>
       </form></div>`;
     $('#f-senha').addEventListener('submit', async ev => {
       ev.preventDefault();
-      const ia = !!(ev.submitter && ev.submitter.value === 'ia');
-      document.querySelectorAll('#f-senha button').forEach(x => { x.disabled = true; });
+      const campo = $('#senha'); campo.disabled = true;
       try {
-        const k = await C.chaves($('#senha').value);
-        if ((await C.sha256hex(k.auth)) !== (ia ? CFG.authHashIA : CFG.authHash)) return tela(true);
-        await abrir(k, ia);
+        // a senha decide o que abre: cada uma leva a um pacote diferente
+        const k = await C.chaves(campo.value), h = await C.sha256hex(k.auth);
+        if (h === CFG.authHash) await abrir(k, false);
+        else if (h === CFG.authHashIA) await abrir(k, true);
+        else tela(true);
       } catch (e) { tela(true, 'Não consegui abrir agora. Confira a internet e tente de novo.'); }
     });
     setTimeout(() => { const i = $('#senha'); if (i) i.focus(); }, 30);
