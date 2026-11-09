@@ -11,15 +11,16 @@
         <label for="senha" style="position:absolute;left:-9999px">Senha</label>
         <input id="senha" class="campo" type="password" autocomplete="current-password" placeholder="Digite aqui">
         <p class="msg-erro" id="msg-erro" role="alert">${erro ? (msg || 'Senha incorreta. Tente de novo.') : ''}</p>
-        <button class="btn cheio grande" style="width:100%">Entrar</button>
+        <div class="trava-botoes"><button class="btn cheio grande" value="app">Entrar</button><button class="btn grande" value="ia">Usar IA</button></div>
       </form></div>`;
     $('#f-senha').addEventListener('submit', async ev => {
       ev.preventDefault();
-      const b = $('#f-senha button'); b.disabled = true;
+      const modo = ev.submitter && ev.submitter.value === 'ia';
+      document.querySelectorAll('#f-senha button').forEach(x => { x.disabled = true; });
       try {
         const k = await C.chaves($('#senha').value);
         if ((await C.sha256hex(k.auth)) !== CFG.authHash) return tela(true);
-        await abrir(k);
+        window.CV_ABRIR_IA = modo; await abrir(k);
       } catch (e) { tela(true, 'Não consegui abrir agora. Confira a internet e tente de novo.'); }
     });
     setTimeout(() => { const i = $('#senha'); if (i) i.focus(); }, 30);

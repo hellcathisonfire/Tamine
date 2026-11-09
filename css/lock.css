@@ -42,3 +42,5 @@ button { cursor: pointer; }
 .btn.leve { border-color: var(--linha); min-height: 38px; padding: 0 14px; font-size: 14px; }
 .btn.grande { min-height: 54px; padding: 0 30px; font-size: 18px; }
 
+.trava-botoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.trava-botoes .btn { padding: 0 12px; }
